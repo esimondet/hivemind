@@ -75,17 +75,12 @@ const userController = {
       });
   },
 
-  //update friend list with id
-  addFriend({ params, body }, res) {
-    User.create(body)
-      .then(({ _id }) => {
-        return User.findOneAndUpdate(
-          { _id: params.userId },
-          { $push: { friends: _id } },
-          { new: true },
-          { new: true, runValidators: true }
-        );
-      })
+  //update friend list by id
+  updateFriend({ params, body }, res) {
+    User.findOneAndUpdate({ _id: params.id }, body, {
+      new: true,
+      runValidators: true,
+    })
       .then((dbUserData) => {
         if (!dbUserData) {
           res.status(404).json({ message: 'No user found with this id!' });
@@ -99,14 +94,14 @@ const userController = {
       });
   },
 
-  //remove friend from friend list with id
+  //remove friend from friend list by id
   removeFriend({ params }, res) {
     User.findOneAndDelete({ _id: params.userId })
       .then((deletedFriend) => {
         if (!deletedFriend) {
           return res.status(404).json({ message: 'No user with this id!' });
         }
-        return Pizza.findOneAndUpdate(
+        return User.findOneAndUpdate(
           { _id: params.userId },
           { $pull: { friends: params.userId } },
           { new: true }
