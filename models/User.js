@@ -11,7 +11,7 @@ const UserSchema = new Schema(
     email: {
       type: String,
       unique: true,
-      required: 'Please list a username!',
+      required: 'Please list an email!',
       match: [/.+@.+\..+/],
     },
     thoughts: [

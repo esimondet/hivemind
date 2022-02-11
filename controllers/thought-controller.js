@@ -28,13 +28,15 @@ const thoughtController = {
   },
 
   //make a new thought
-  //expects {"thoughtText": "The hive provides","username": "zombee","userId": "5edff358a0fcb779aa7b118b"}
+  //expects {"thoughtText": "The hive provides","username": "zombee"}
   addThought({ params, body }, res) {
     Thought.create(body)
       .then(({ _id }) => {
-        return Thought.findOneAndUpdate(
-          { _id: params.thoughtId },
-          { $push: { thoughts: _id } },
+        console.log(_id);
+        console.log(params.userId);
+        return User.findOneAndUpdate(
+          { _id: params.userId },
+          // { $push: { thoughts: _id } },
           { new: true },
           { new: true, runValidators: true }
         );
