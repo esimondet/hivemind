@@ -31,13 +31,10 @@ const thoughtController = {
   //expects {"thoughtText": "The hive provides","username": "zombee"}
   addThought({ params, body }, res) {
     Thought.create(body)
-      .then(({ _id }) => {
-        console.log(_id);
-        console.log(params.userId);
+      .then((dbThoughtData) => {
         return User.findOneAndUpdate(
-          { _id: params.userId },
-          // { $push: { thoughts: _id } },
-          { new: true },
+          { _id: params.id },
+          { $push: { thoughts: dbThoughtData._id } },
           { new: true, runValidators: true }
         );
       })
@@ -75,13 +72,14 @@ const thoughtController = {
 
   //delete a thought
   removeThought({ params }, res) {
-    Thought.findOneAndDelete({ _id: params.thoughtId })
-      .then((deletedThought) => {
-        if (!deletedThought) {
-          return res.status(404).json({ message: 'No thought with this id!' });
+    Thought.findOneAndDelete({ _id: params.id })
+      .then((dbThoughtData) => {
+        if (!dbThoughtData) {
+          res.status(404).json({ message: 'No thought with this id!' });
+          return;
         }
         return User.findOneAndUpdate(
-          { _id: params.userId },
+          { _id: params.id },
           { $pull: { thoughts: params.thoughtId } },
           { new: true }
         );
@@ -103,9 +101,8 @@ const thoughtController = {
   addReaction({ params, body }, res) {
     Thought.findOneAndUpdate(
       { _id: params.thoughtId },
-      { $push: { replies: body } },
-      { new: true },
-      { new: true, runValidators: true }
+      { $push: { reactions: body } },
+      { new: true, runValidators: false }
     )
       .then((dbThoughtData) => {
         if (!dbThoughtData) {
@@ -124,7 +121,7 @@ const thoughtController = {
   removeReaction({ params }, res) {
     Thought.findOneAndUpdate(
       { _id: params.thoughtId },
-      { $pull: { replies: { reactionId: params.reactionId } } },
+      { $pull: { reactions: { reactionId: params.reactionId } } },
       { new: true }
     )
       .then((dbThoughtData) => res.json(dbThoughtData))
