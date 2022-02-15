@@ -78,11 +78,6 @@ const thoughtController = {
           res.status(404).json({ message: 'No thought with this id!' });
           return;
         }
-        return User.findOneAndUpdate(
-          { _id: params.id },
-          { $pull: { thoughts: params.thoughtId } },
-          { new: true }
-        );
       })
       .then((dbThoughtData) => {
         if (!dbThoughtData) {
